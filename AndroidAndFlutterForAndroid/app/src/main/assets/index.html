@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+<div><button onclick="getLocation()">getLocation</button></div>
+<div><button>getLocation</button></div>
+<div><button>getLocation</button></div>
+
+
+<script>
+  function setupWebViewJavascriptBridge(callback) {
+    if (window.WebViewJavascriptBridge) { return callback(WebViewJavascriptBridge); }
+    if (window.WVJBCallbacks) { return window.WVJBCallbacks.push(callback); }
+    window.WVJBCallbacks = [callback];
+    var WVJBIframe = document.createElement('iframe');
+    WVJBIframe.style.display = 'none';
+    WVJBIframe.src = 'wvjbscheme://__BRIDGE_LOADED__';
+    document.documentElement.appendChild(WVJBIframe);
+    setTimeout(function() { document.documentElement.removeChild(WVJBIframe) }, 0)
+  }
+  function initBridge(){
+    setupWebViewJavascriptBridge(function (bridge) {
+      /* Initialize your app here */
+      console.log('setupAndroidWebViewJavascriptBridge');
+      bridge.send = (functionName, params, callback) => {
+        bridge.callHandler('srsBridge', JSON.stringify({
+          functionName: functionName,
+          params: params
+        }), callback);
+      }
+      window.WebViewJavascriptBridge = bridge;
+    });
+  }
+  initBridge();
+  function getLocation(){
+    console.log('haha');
+    if (window.WebViewJavascriptBridge) {
+      window.WebViewJavascriptBridge.send('getLocation', null, function(result){
+        console.log(result);
+      });
+    }
+  }
+  </script>
+</body>
+</html>
